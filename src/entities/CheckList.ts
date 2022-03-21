@@ -4,11 +4,11 @@ import { ProgressCategory } from "./ProgressCategory";
 
 @ObjectType()
 @Entity()
-export class CheckLiist extends BaseEntity {
+export class CheckList extends BaseEntity {
 
     @Field()
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Field()
     @Column()
