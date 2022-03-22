@@ -1,8 +1,6 @@
 import { CheckList } from "../entities/CheckList";
 import { Resolver, Query, ObjectType, Field, Mutation, Arg } from "type-graphql";
-import { CheckListsStore } from '../store'
-import { searchById } from "../utils";
-
+import { CheckListsStore, CheckListItem } from '../store'
 
 @ObjectType()
 class FieldError {
@@ -16,7 +14,7 @@ class Response {
     errors?: FieldError[];
 
     @Field(() => CheckList, { nullable: true })
-    listItem?: CheckList;
+    listItem?: CheckListItem;
 }
 
 
@@ -39,9 +37,9 @@ export class ChecklistResolver {
         @Arg('id') id: string
     ): Response {
 
-        const listItem = searchById(id, CheckListsStore)
+        const itemIdx = CheckListsStore.findIndex((item) => item.id === id)
 
-        if (!listItem) {
+        if (itemIdx === -1) {
             return {
                 errors: [
                     {
@@ -51,10 +49,10 @@ export class ChecklistResolver {
             }
         }
 
-        listItem.isChecked = !listItem.isChecked
-
+        CheckListsStore[itemIdx].isChecked = !CheckListsStore[itemIdx].isChecked
+        const listItem = CheckListsStore[itemIdx]
+        
         return {
-            // @ts-ignore
             listItem
         }
     }

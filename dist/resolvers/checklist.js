@@ -16,7 +16,6 @@ exports.ChecklistResolver = void 0;
 const CheckList_1 = require("../entities/CheckList");
 const type_graphql_1 = require("type-graphql");
 const store_1 = require("../store");
-const utils_1 = require("../utils");
 let FieldError = class FieldError {
 };
 __decorate([
@@ -34,7 +33,7 @@ __decorate([
 ], Response.prototype, "errors", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => CheckList_1.CheckList, { nullable: true }),
-    __metadata("design:type", CheckList_1.CheckList)
+    __metadata("design:type", Object)
 ], Response.prototype, "listItem", void 0);
 Response = __decorate([
     (0, type_graphql_1.ObjectType)()
@@ -47,8 +46,8 @@ let ChecklistResolver = class ChecklistResolver {
         return store_1.CheckListsStore;
     }
     toggleCompleted(id) {
-        const listItem = (0, utils_1.searchById)(id, store_1.CheckListsStore);
-        if (!listItem) {
+        const itemIdx = store_1.CheckListsStore.findIndex((item) => item.id === id);
+        if (itemIdx === -1) {
             return {
                 errors: [
                     {
@@ -57,7 +56,8 @@ let ChecklistResolver = class ChecklistResolver {
                 ]
             };
         }
-        listItem.isChecked = !listItem.isChecked;
+        store_1.CheckListsStore[itemIdx].isChecked = !store_1.CheckListsStore[itemIdx].isChecked;
+        const listItem = store_1.CheckListsStore[itemIdx];
         return {
             listItem
         };
