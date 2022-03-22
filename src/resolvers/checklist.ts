@@ -1,6 +1,7 @@
 import { CheckList } from "../entities/CheckList";
 import { Resolver, Query, ObjectType, Field, Mutation, Arg } from "type-graphql";
-import { CheckListsStore, ProgressCategoryStore, searchById } from '../utils'
+import { CheckListsStore } from '../store'
+import { searchById } from "../utils";
 
 
 @ObjectType()
@@ -24,34 +25,21 @@ export class ChecklistResolver {
 
     // Query to get all checklist items
     @Query(() => [CheckList], { nullable: true })
-    async getListItems() {
+    getListItems() {
 
-        try {
-            const listItems = CheckListsStore;
-            return listItems
+        if (!CheckListsStore.length) {
+            return null
         }
-        catch (error) {
-            return {
-                errors: [
-                    {
-                        message: error.message
-                    }
-                ]
-            }
-        }
-
+        return CheckListsStore;
     }
 
     // mutation to toggle checklist item completed state
     @Mutation(() => Response)
-    async toggleCompleted(
+    toggleCompleted(
         @Arg('id') id: string
-    ): Promise<Response> {
-        // meant to return one item with a real db. This might return an array
-        const possibleListItems = await searchById(id, CheckListsStore)
+    ): Response {
 
-        // lazy maneuver
-        const listItem = possibleListItems.pop()
+        const listItem = searchById(id, CheckListsStore)
 
         if (!listItem) {
             return {
